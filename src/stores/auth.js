@@ -232,35 +232,35 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
 
-  const verifyToken = async () => {
-    if (!token.value) return false
+  // const verifyToken = async () => {
+  //   if (!token.value) return false
 
-    try {
-      const response = await authApi.verifyToken()
-
-      if (response.success && response.data.valid) {
-        // Update user data if provided
-        if (response.data.user) {
-          user.value = response.data.user
-          localStorage.setItem('user_data', JSON.stringify(user.value))
-        }
-        return true
-      } else {
-        // Token is invalid, try to refresh
-        if (refreshToken.value) {
-          await refreshAuthToken()
-          return true
-        } else {
-          await logout()
-          return false
-        }
-      }
-    } catch (error) {
-      console.error('Token verification error:', error)
-      await logout()
-      return false
-    }
-  }
+  //   try {
+  //     const response = await authApi.verifyToken()
+  //     console.log(response)
+  //     if (response) {
+  //       // Update user data if provided
+  //       if (response.data.user) {
+  //         user.value = response.data.user
+  //         localStorage.setItem('user_data', JSON.stringify(user.value))
+  //       }
+  //       return true
+  //     } else {
+  //       // Token is invalid, try to refresh
+  //       if (refreshToken.value) {
+  //         await refreshAuthToken()
+  //         return true
+  //       } else {
+  //         await logout()
+  //         return false
+  //       }
+  //     }
+  //   } catch (error) {
+  //     console.error('Token verification error:', error)
+  //     await logout()
+  //     return false
+  //   }
+  // }
 
   // Permission checking methods
   const hasPermission = (permission) => {
@@ -333,10 +333,10 @@ export const useAuthStore = defineStore('auth', () => {
       lastLoginAttempt.value = parseInt(storedLastAttempt, 10) || null
     }
 
-    // Verify token if exists
-    if (token.value && user.value) {
-      await verifyToken()
-    }
+    // // Verify token if exists
+    // if (token.value && user.value) {
+    //   await verifyToken()
+    // }
   }
 
   // Auto-refresh token setup
@@ -377,7 +377,7 @@ export const useAuthStore = defineStore('auth', () => {
     updateProfile,
     changePassword,
     resetPassword,
-    verifyToken,
+    // verifyToken,
     initializeAuth,
     setupTokenRefresh,
 

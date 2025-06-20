@@ -301,10 +301,10 @@ import { useAuthStore } from '@/stores/auth'
 import { useDictionariesStore } from '@/stores/dictionaries'
 import { formatFileSize } from '@/utils/formatters'
 import StatusBadge from '@/components/common/StatusBadge.vue'
-import BaseInput from '@/components/ui/BaseInput.vue'
-import BaseSelect from '@/components/ui/BaseSelect.vue'
-import BaseTextarea from '@/components/ui/BaseTextarea.vue'
-import BaseButton from '@/components/ui/BaseButton.vue'
+import BaseInput from '@/components/common/BaseInput.vue'
+import BaseSelect from '@/components/common/BaseSelect.vue'
+import BaseTextarea from '@/components/common/BaseTextarea.vue'
+import BaseButton from '@/components/common/BaseButton.vue'
 
 const props = defineProps({
   complaint: {

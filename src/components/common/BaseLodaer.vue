@@ -35,7 +35,7 @@ const loaderClasses = computed(() => {
 
 <style scoped>
 .loader-spinner {
-  @apply inline-block animate-spin rounded-full border-2 border-solid border-current border-r-transparent;
+  /* @apply inline-block animate-spin rounded-full border-2 border-solid border-current border-r-transparent; */
   width: 1rem;
   height: 1rem;
 }

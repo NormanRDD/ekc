@@ -23,7 +23,7 @@
 
       <!-- Icon -->
       <div
-        v-if="$slots.icon"
+        v-if="slots.icon"
         class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none"
       >
         <slot name="icon" />
@@ -61,7 +61,9 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { computed, useSlots } from 'vue'
+
+const slots = useSlots()
 
 const props = defineProps({
   modelValue: {
@@ -108,7 +110,7 @@ const inputClasses = computed(() => {
     backgroundClasses = 'bg-gray-50'
   }
 
-  const paddingClasses = props.clearable || props.$slots.icon ? 'px-3 py-2 pr-10' : 'px-3 py-2'
+  const paddingClasses = props.clearable || slots.icon ? 'px-3 py-2 pr-10' : 'px-3 py-2'
 
   return [baseClasses, borderClasses, backgroundClasses, paddingClasses].join(' ')
 })
@@ -132,10 +134,10 @@ const handleClear = () => {
 
 <style scoped>
 .form-group {
-  @apply space-y-1;
+  /* @apply space-y-1; */
 }
 
 .form-label {
-  @apply block text-sm font-medium text-gray-700;
+  /* @apply block text-sm font-medium text-gray-700; */
 }
 </style>

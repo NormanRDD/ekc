@@ -15,17 +15,17 @@ export const useAuthStore = defineStore('auth', () => {
 
   // Computed
   const isAuthenticated = computed(() => !!token.value && !!user.value)
-  
+
   const userRole = computed(() => user.value?.role || null)
-  
+
   const userPermissions = computed(() => user.value?.permissions || [])
-  
+
   const isBlocked = computed(() => {
     if (loginAttempts.value < 3) return false
-    
+
     const lastAttempt = lastLoginAttempt.value
     if (!lastAttempt) return false
-    
+
     const blockDuration = 15 * 60 * 1000 // 15 minutes
     return Date.now() - lastAttempt < blockDuration
   })
@@ -39,7 +39,7 @@ export const useAuthStore = defineStore('auth', () => {
 
   // Role-based permissions mapping
   const rolePermissions = {
-    'admin': [
+    admin: [
       'view_all_tickets',
       'edit_all_tickets',
       'create_ticket',
@@ -47,65 +47,51 @@ export const useAuthStore = defineStore('auth', () => {
       'reports',
       'user_management',
       'system_settings',
-      'export_data'
+      'export_data',
     ],
-    'dispatcher': [
-      'view_own_tickets',
-      'create_ticket',
-      'edit_own_tickets',
-      'view_reports_basic'
-    ],
-    'senior_doctor': [
+    dispatcher: ['view_own_tickets', 'create_ticket', 'edit_own_tickets', 'view_reports_basic'],
+    senior_doctor: [
       'view_assigned_tickets',
       'edit_assigned_tickets',
       'view_reports_basic',
-      'assign_tickets'
-    ],
-    'pmsp': [
-      'view_organization_tickets',
-      'edit_organization_tickets',
-      'respond_to_complaints'
-    ],
-    'uoz': [
-      'view_all_tickets',
-      'edit_all_tickets',
-      'reports',
       'assign_tickets',
-      'escalate_tickets'
-    ]
+    ],
+    pmsp: ['view_organization_tickets', 'edit_organization_tickets', 'respond_to_complaints'],
+    uoz: ['view_all_tickets', 'edit_all_tickets', 'reports', 'assign_tickets', 'escalate_tickets'],
   }
 
   // Actions
   const login = async (credentials) => {
-    if (isBlocked.value) {
-      throw new Error('Аккаунт временно заблокирован. Попробуйте позже.')
-    }
+    // if (isBlocked.value) {
+    //   throw new Error('Аккаунт временно заблокирован. Попробуйте позже.')
+    // }
 
     loading.value = true
-    
+
     try {
       const response = await authApi.login(credentials)
-      
-      if (response.success) {
-        // Set tokens
-        token.value = response.data.token
-        refreshToken.value = response.data.refreshToken
-        user.value = response.data.user
-        
+      if (response) {
+        token.value = response.access_token
+        refreshToken.value = response.refresh_token
+        const rest = { ...response }
+        delete rest.access_token
+        delete rest.refresh_token
+        user.value = rest
+
         // Store in localStorage
         localStorage.setItem('auth_token', token.value)
         localStorage.setItem('refresh_token', refreshToken.value)
         localStorage.setItem('user_data', JSON.stringify(user.value))
-        
+
         // Reset login attempts
         loginAttempts.value = 0
         lastLoginAttempt.value = null
         localStorage.removeItem('login_attempts')
         localStorage.removeItem('last_login_attempt')
-        
+
         // Set default axios auth header for apiClient
-        apiClient.defaults.headers.common['Authorization'] = `Bearer ${token.value}`
-        
+        // apiClient.defaults.headers.common['Authorization'] = `Bearer ${token.value}`
+
         return response.data
       } else {
         throw new Error(response.message || 'Ошибка входа')
@@ -116,7 +102,7 @@ export const useAuthStore = defineStore('auth', () => {
       lastLoginAttempt.value = Date.now()
       localStorage.setItem('login_attempts', loginAttempts.value.toString())
       localStorage.setItem('last_login_attempt', lastLoginAttempt.value.toString())
-      
+
       console.error('Login error:', error)
       throw error
     } finally {
@@ -126,7 +112,7 @@ export const useAuthStore = defineStore('auth', () => {
 
   const logout = async () => {
     loading.value = true
-    
+
     try {
       // Call logout API if token exists
       if (token.value) {
@@ -140,17 +126,17 @@ export const useAuthStore = defineStore('auth', () => {
       user.value = null
       token.value = null
       refreshToken.value = null
-      
+
       // Clear localStorage
       localStorage.removeItem('auth_token')
       localStorage.removeItem('refresh_token')
       localStorage.removeItem('user_data')
-      
+
       // Clear axios auth header
       delete apiClient.defaults.headers.common['Authorization']
-      
+
       loading.value = false
-      
+
       // Redirect to login
       if (router) {
         router.push('/login')
@@ -165,15 +151,16 @@ export const useAuthStore = defineStore('auth', () => {
 
     try {
       const response = await authApi.refreshToken(refreshToken.value)
-      
-      if (response.success) {
-        token.value = response.data.token
-        localStorage.setItem('auth_token', token.value)
-        
+
+      if (response) {
+        token.value = response.access_token
+        localStorage.setItem('auth_token', response.access_token)
+        localStorage.setItem('refresh_token', response.refresh_token)
+
         // Update axios header
-        apiClient.defaults.headers.common['Authorization'] = `Bearer ${token.value}`
-        
-        return token.value
+        // apiClient.defaults.headers.common['Authorization'] = `Bearer ${token.value}`
+
+        return response
       } else {
         throw new Error('Token refresh failed')
       }
@@ -187,10 +174,10 @@ export const useAuthStore = defineStore('auth', () => {
 
   const updateProfile = async (profileData) => {
     loading.value = true
-    
+
     try {
       const response = await authApi.updateProfile(profileData)
-      
+
       if (response.success) {
         // Update user data
         user.value = { ...user.value, ...response.data }
@@ -209,10 +196,10 @@ export const useAuthStore = defineStore('auth', () => {
 
   const changePassword = async (passwordData) => {
     loading.value = true
-    
+
     try {
       const response = await authApi.changePassword(passwordData)
-      
+
       if (response.success) {
         return response.data
       } else {
@@ -228,10 +215,10 @@ export const useAuthStore = defineStore('auth', () => {
 
   const resetPassword = async (email) => {
     loading.value = true
-    
+
     try {
       const response = await authApi.resetPassword(email)
-      
+
       if (response.success) {
         return response.data
       } else {
@@ -247,10 +234,10 @@ export const useAuthStore = defineStore('auth', () => {
 
   const verifyToken = async () => {
     if (!token.value) return false
-    
+
     try {
       const response = await authApi.verifyToken()
-      
+
       if (response.success && response.data.valid) {
         // Update user data if provided
         if (response.data.user) {
@@ -278,14 +265,14 @@ export const useAuthStore = defineStore('auth', () => {
   // Permission checking methods
   const hasPermission = (permission) => {
     if (!user.value || !user.value.role) return false
-    
+
     // Admin has all permissions
     if (user.value.role === 'admin') return true
-    
+
     // Check role-based permissions
     const rolePerms = rolePermissions[user.value.role] || []
     if (rolePerms.includes(permission)) return true
-    
+
     // Check user-specific permissions
     const userPerms = userPermissions.value || []
     return userPerms.includes(permission)
@@ -302,10 +289,10 @@ export const useAuthStore = defineStore('auth', () => {
   const canAccessRoute = (routeMeta) => {
     if (!routeMeta.requiresAuth) return true
     if (!isAuthenticated.value) return false
-    
+
     if (routeMeta.roles && !hasAnyRole(routeMeta.roles)) return false
     if (routeMeta.permissions && !routeMeta.permissions.every(hasPermission)) return false
-    
+
     return true
   }
 
@@ -317,18 +304,18 @@ export const useAuthStore = defineStore('auth', () => {
     const storedUser = localStorage.getItem('user_data')
     const storedAttempts = localStorage.getItem('login_attempts')
     const storedLastAttempt = localStorage.getItem('last_login_attempt')
-    
+
     if (storedToken) {
       token.value = storedToken
-      
+
       // Set axios header for apiClient
-      apiClient.defaults.headers.common['Authorization'] = `Bearer ${storedToken}`
+      // apiClient.defaults.headers.common['Authorization'] = `Bearer ${storedToken}`
     }
-    
+
     if (storedRefreshToken) {
       refreshToken.value = storedRefreshToken
     }
-    
+
     if (storedUser) {
       try {
         user.value = JSON.parse(storedUser)
@@ -337,15 +324,15 @@ export const useAuthStore = defineStore('auth', () => {
         localStorage.removeItem('user_data')
       }
     }
-    
+
     if (storedAttempts) {
       loginAttempts.value = parseInt(storedAttempts, 10) || 0
     }
-    
+
     if (storedLastAttempt) {
       lastLoginAttempt.value = parseInt(storedLastAttempt, 10) || null
     }
-    
+
     // Verify token if exists
     if (token.value && user.value) {
       await verifyToken()
@@ -356,7 +343,7 @@ export const useAuthStore = defineStore('auth', () => {
   const setupTokenRefresh = () => {
     // Refresh token 5 minutes before expiry
     const refreshInterval = 25 * 60 * 1000 // 25 minutes
-    
+
     setInterval(async () => {
       if (token.value && refreshToken.value) {
         try {
@@ -374,7 +361,7 @@ export const useAuthStore = defineStore('auth', () => {
     token,
     loading,
     loginAttempts,
-    
+
     // Computed
     isAuthenticated,
     userRole,
@@ -382,7 +369,7 @@ export const useAuthStore = defineStore('auth', () => {
     isBlocked,
     userDisplayName,
     userOrganization,
-    
+
     // Actions
     login,
     logout,
@@ -393,11 +380,11 @@ export const useAuthStore = defineStore('auth', () => {
     verifyToken,
     initializeAuth,
     setupTokenRefresh,
-    
+
     // Permission methods
     hasPermission,
     hasRole,
     hasAnyRole,
-    canAccessRoute
+    canAccessRoute,
   }
 })

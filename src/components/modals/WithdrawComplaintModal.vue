@@ -172,10 +172,10 @@
 import { ref, reactive, computed, watch } from 'vue'
 import { useAuthStore } from '@/stores/auth'
 import { formatDate, formatDateTime } from '@/utils/formatters'
-import BaseModal from '@/components/ui/BaseModal.vue'
-import BaseSelect from '@/components/ui/BaseSelect.vue'
-import BaseTextarea from '@/components/ui/BaseTextarea.vue'
-import BaseButton from '@/components/ui/BaseButton.vue'
+import BaseModal from '@/components/common/BaseModal.vue'
+import BaseSelect from '@/components/common/BaseSelect.vue'
+import BaseTextarea from '@/components/common/BaseTextarea.vue'
+import BaseButton from '@/components/common/BaseButton.vue'
 import StatusBadge from '@/components/common/StatusBadge.vue'
 
 const props = defineProps({

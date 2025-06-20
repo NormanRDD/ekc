@@ -169,7 +169,7 @@ import { ref, computed } from 'vue'
 import { useAuthStore } from '@/stores/auth'
 import { formatDateTime } from '@/utils/formatters'
 import StatusBadge from '@/components/common/StatusBadge.vue'
-import BaseButton from '@/components/ui/BaseButton.vue'
+import BaseButton from '@/components/common/BaseButton.vue'
 
 const props = defineProps({
   ticketId: {

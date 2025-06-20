@@ -52,7 +52,7 @@
 
 <script setup>
 import { computed } from 'vue'
-import BaseLoader from './BaseLoader.vue'
+import BaseLoader from './BaseLodaer.vue'
 
 const props = defineProps({
   modelValue: {

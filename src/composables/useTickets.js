@@ -8,6 +8,7 @@ export function useTickets() {
 
   // Re-export store state and getters
   const tickets = computed(() => ticketsStore.tickets)
+  const pagination = computed(() => ticketsStore.pagination)
   const currentTicket = computed(() => ticketsStore.currentTicket)
   const loading = computed(() => ticketsStore.loading)
   const error = computed(() => ticketsStore.error)
@@ -293,6 +294,7 @@ export function useTickets() {
     // State
     tickets,
     currentTicket,
+    pagination,
     loading,
     error,
     totalPages,

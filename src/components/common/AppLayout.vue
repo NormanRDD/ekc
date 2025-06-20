@@ -223,11 +223,11 @@ onUnmounted(() => {
 </script>
 
 <style scoped>
-.nav-link {
+/* .nav-link {
   @apply flex items-center space-x-3 px-3 py-2 text-gray-700 rounded-lg hover:bg-gray-100 transition-colors;
 }
 
 .nav-link-active {
   @apply bg-blue-50 text-blue-700 border-r-2 border-blue-500;
-}
+} */
 </style>

@@ -2,14 +2,10 @@
   <div class="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
     <div class="max-w-md w-full space-y-8">
       <div>
-        <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900">
-          Вход в систему
-        </h2>
-        <p class="mt-2 text-center text-sm text-gray-600">
-          Тикетная система ТМЦ
-        </p>
+        <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900">Вход в систему</h2>
+        <p class="mt-2 text-center text-sm text-gray-600">Тикетная система ТМЦ</p>
       </div>
-      
+
       <form class="mt-8 space-y-6" @submit.prevent="handleLogin">
         <div class="space-y-4">
           <BaseInput
@@ -20,7 +16,7 @@
             :error="errors.username"
             placeholder="Введите логин"
           />
-          
+
           <BaseInput
             v-model="form.password"
             label="Пароль"
@@ -47,17 +43,11 @@
         </div>
 
         <div>
-          <BaseButton
-            type="submit"
-            variant="primary"
-            size="lg"
-            full-width
-            :loading="loading"
-          >
+          <BaseButton type="submit" variant="primary" size="lg" full-width :loading="loading">
             Войти
           </BaseButton>
         </div>
-        
+
         <!-- Demo credentials -->
         <div class="mt-6 p-4 bg-blue-50 rounded-lg">
           <p class="text-sm text-blue-800 font-medium mb-2">Демо доступы:</p>
@@ -76,6 +66,8 @@
 import { reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
+import BaseButton from '@/components/common/BaseButton.vue'
+import BaseInput from '@/components/common/BaseInput.vue'
 
 const router = useRouter()
 const authStore = useAuthStore()
@@ -83,7 +75,7 @@ const authStore = useAuthStore()
 const form = reactive({
   username: '',
   password: '',
-  rememberMe: false
+  rememberMe: false,
 })
 
 const errors = reactive({})
@@ -91,33 +83,33 @@ const loading = ref(false)
 
 const handleLogin = async () => {
   // Clear previous errors
-  Object.keys(errors).forEach(key => delete errors[key])
-  
+  Object.keys(errors).forEach((key) => delete errors[key])
+
   // Basic validation
   if (!form.username) {
     errors.username = 'Введите логин'
     return
   }
-  
+
   if (!form.password) {
     errors.password = 'Введите пароль'
     return
   }
-  
+
   loading.value = true
-  
+
   try {
     await authStore.login({
       username: form.username,
       password: form.password,
-      rememberMe: form.rememberMe
+      rememberMe: form.rememberMe,
     })
-    
+
     router.push('/dashboard')
     window.showToast('Добро пожаловать в систему!', 'success')
   } catch (error) {
     errors.general = error.message
-    window.showToast(error.message, 'error')
+    // window.showToast(error.message, 'error')
   } finally {
     loading.value = false
   }

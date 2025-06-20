@@ -17,69 +17,69 @@ import ReportsView from '../views/reports/ReportsView.vue'
 const routes = [
   {
     path: '/',
-    redirect: '/dashboard'
+    redirect: '/dashboard',
   },
   {
     path: '/login',
     name: 'Login',
     component: LoginView,
-    meta: { 
+    meta: {
       layout: 'auth',
-      requiresAuth: false 
-    }
+      requiresAuth: false,
+    },
   },
   {
     path: '/dashboard',
     name: 'Dashboard',
     component: DashboardView,
-    meta: { 
+    meta: {
       requiresAuth: true,
-      title: 'Главная'
-    }
+      title: 'Главная',
+    },
   },
   {
     path: '/tickets',
     name: 'TicketsList',
     component: TicketsListView,
-    meta: { 
+    meta: {
       requiresAuth: true,
-      title: 'Список обращений'
-    }
+      title: 'Список обращений',
+    },
   },
   {
     path: '/tickets/new',
     name: 'TicketCreate',
     component: TicketCreateView,
-    meta: { 
+    meta: {
       requiresAuth: true,
       permissions: ['create_ticket'],
-      title: 'Создать обращение'
-    }
+      title: 'Создать обращение',
+    },
   },
   {
     path: '/tickets/:id',
     name: 'TicketDetail',
     component: TicketDetailView,
-    meta: { 
+    meta: {
       requiresAuth: true,
-      title: 'Обращение'
-    }
+      title: 'Обращение',
+    },
   },
   {
     path: '/reports',
     name: 'Reports',
     component: ReportsView,
-    meta: { 
+    meta: {
       requiresAuth: true,
       permissions: ['reports'],
-      title: 'Отчеты'
-    }
+      title: 'Отчеты',
+    },
   },
   {
     path: '/:pathMatch(.*)*',
     name: 'NotFound',
-    component: () => import('../views/NotFoundView.vue')
-  }
+    component: () => import('../views/NotFoundView.vue'),
+  },
 ]
 
 export const router = createRouter({
@@ -91,5 +91,50 @@ export const router = createRouter({
     } else {
       return { top: 0 }
     }
+  },
+})
+
+// Navigation guard with lazy store import
+router.beforeEach(async (to, from, next) => {
+  // Импортируем store только когда он нужен (внутри navigation guard)
+  const { useAuthStore } = await import('@/stores/auth')
+  const authStore = useAuthStore()
+
+  const routeMeta = to.meta || {}
+
+  // Функция проверки доступа к маршруту
+  const canAccessRoute = (routeMeta) => {
+    if (!routeMeta.requiresAuth) return true
+    if (!authStore.isAuthenticated) return false
+
+    if (routeMeta.roles && !authStore.hasAnyRole(routeMeta.roles)) return false
+    if (routeMeta.permissions && !routeMeta.permissions.every(authStore.hasPermission)) return false
+
+    return true
+  }
+
+  // Если маршрут не требует авторизации, пропускаем
+  if (!routeMeta.requiresAuth) {
+    next()
+    return
+  }
+  console.log('state:', authStore.isAuthenticated)
+  // Если пользователь не авторизован, перенаправляем на логин
+  if (!authStore.isAuthenticated) {
+    // Сохраняем путь для редиректа после логина
+    const redirectPath = to.fullPath !== '/login' ? to.fullPath : null
+    next({
+      name: 'Login',
+      query: redirectPath ? { redirect: redirectPath } : undefined,
+    })
+    return
+  }
+
+  // Проверяем доступ к маршруту
+  if (canAccessRoute(routeMeta)) {
+    next()
+  } else {
+    // Если нет прав доступа, перенаправляем на главную
+    next({ name: 'Dashboard' })
   }
 })

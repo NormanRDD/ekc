@@ -264,10 +264,10 @@ export const useAuthStore = defineStore('auth', () => {
 
   // Permission checking methods
   const hasPermission = (permission) => {
-    if (!user.value || !user.value.role) return false
+    if (!user.value || !user.value.user_role) return false
 
     // Admin has all permissions
-    if (user.value.role === 'admin') return true
+    if (user.value.user_role === 'system_admin') return true
 
     // Check role-based permissions
     const rolePerms = rolePermissions[user.value.role] || []

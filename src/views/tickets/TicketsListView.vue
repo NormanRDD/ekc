@@ -216,12 +216,12 @@
 import { ref, computed, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
-import { useTickets } from '@/composables/useTickets'
+import { useTicketsStore } from '@/stores/tickets'
 import { useDictionariesStore } from '@/stores/dictionaries'
 
 const router = useRouter()
 const authStore = useAuthStore()
-const ticketsStore = useTickets()
+const ticketsStore = useTicketsStore()
 const dictionariesStore = useDictionariesStore()
 
 const {
@@ -335,8 +335,8 @@ const withdrawComplaint = async (ticket) => {
         getTickets()
       }
     } catch (error) {
-        console.log(error);
-        
+      console.log(error)
+
       window.showToast('Ошибка отзыва жалобы', 'error')
     }
   }
@@ -348,8 +348,8 @@ const exportTickets = async () => {
     await exportTicketsAction('excel')
     window.showToast('Данные экспортированы', 'success')
   } catch (error) {
-    console.log(error);
-    
+    console.log(error)
+
     window.showToast('Ошибка экспорта', 'error')
   } finally {
     exporting.value = false

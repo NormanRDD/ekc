@@ -1,5 +1,4 @@
-// ===== src/views/reports/ReportsView.vue =====
-<template>
+ <template>
   <div class="space-y-6">
     <!-- Page Header -->
     <div class="flex justify-between items-center">

@@ -123,7 +123,7 @@
                 class="flex items-center space-x-3 p-2 rounded-lg hover:bg-gray-100"
               >
                 <div class="text-right">
-                  <div class="text-sm font-medium text-gray-900">{{ authStore.user?.name }}</div>
+                  <div class="text-sm font-medium text-gray-900">{{ authStore.user?.username }}</div>
                   <div class="text-xs text-gray-500">{{ getRoleDisplayName() }}</div>
                 </div>
                 <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
@@ -157,12 +157,13 @@
 
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue'
-import { useAuthStore } from '@/stores/auth'
 import { useNotificationsStore } from '@/stores/notifications'
 import NotificationsDropdown from './NotificationsDropdown.vue'
-import UserMenuDropdown from './UserMenuDropdown.vue'
+import UserMenuDropdown from '@/components/common/UserMenuDropdown.vue'
 import UserSettings from '../modals/UserSettings.vue'
 import { useRouter } from 'vue-router'
+import BaseModal from '@/components/modals/BaseModal.vue'
+import { useAuthStore } from '@/stores/auth'
 
 const authStore = useAuthStore()
 const notificationsStore = useNotificationsStore()

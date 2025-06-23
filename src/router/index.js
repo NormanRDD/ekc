@@ -119,7 +119,7 @@ router.beforeEach(async (to, from, next) => {
     return
   }
   // Если пользователь не авторизован, перенаправляем на логин
-  console.log('state:', authStore.isAuthenticated)
+
   if (!authStore.isAuthenticated) {
     // Сохраняем путь для редиректа после логина
     const redirectPath = to.fullPath !== '/login' ? to.fullPath : null
